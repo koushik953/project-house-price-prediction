@@ -1,0 +1,40 @@
+import pandas as pd
+
+# Load dataset
+df = pd.read_csv("Data set for this project.csv")  # replace with actual filename
+
+# View first few rows
+print(df)
+df.isnull().sum()
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Select only numeric columns for correlation
+numeric_df = df.select_dtypes(include='number')
+
+# Correlation heatmap
+sns.heatmap(numeric_df.corr(), annot=True, cmap="coolwarm")
+plt.show()
+X = df.drop('price', axis=1)
+y = df['price']
+
+from sklearn.linear_model import LinearRegression
+
+# One-hot encode training and test sets
+X_train_encoded = pd.get_dummies(X_train, drop_first=True)
+X_test_encoded = pd.get_dummies(X_test, drop_first=True)
+
+# Align columns to avoid mismatch between train and test
+X_train_encoded, X_test_encoded = X_train_encoded.align(
+    X_test_encoded,
+    join='left',
+    axis=1,
+    fill_value=0
+)
+
+# Fit the model
+model = LinearRegression()
+model.fit(X_train_encoded, y_train)
+# Predict using the aligned test set
+y_pred = model.predict(X_test_encoded)
